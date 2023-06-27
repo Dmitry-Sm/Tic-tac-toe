@@ -13,7 +13,6 @@ class Game {
     public function new(app: Application) {
         this.app = app;
         board = new Board(app);
-        board.onWin = OnWin;
         board.onEnd = OnEnd;
 
         LoadAssets();
@@ -30,7 +29,8 @@ class Game {
         app.stage.addChild(graphic);
     }
 
-    private function OnEnd() {
+    private function OnEnd(sign: SignType) {
+        winText[sign].visible = true;
         graphic.visible = true;
     }
 
@@ -38,7 +38,7 @@ class Game {
         graphic.visible = false;
         board.Restart();
 
-        for (sign in [SignType.Circle, SignType.Cross]) {
+        for (sign in [SignType.Circle, SignType.Cross, SignType.None]) {
             winText[sign].visible = false;
         }
     }
@@ -50,20 +50,18 @@ class Game {
 		loader.load(onAssetsLoaded);
     }
 
-    private function OnWin(sign: SignType): Void {
-        winText[sign].visible = true;
-    }
-
     private function onAssetsLoaded(): Void {
         var styleDark = {
             font: 'darkFont',
             fontSize: 120,
-            align: CENTER
+            align: CENTER,
+            textAlign: CENTER
         };
         var styleLight = {
             font: 'lightFont',
             fontSize: 120,
-            align: CENTER
+            align: CENTER,
+            textAlign: CENTER
         };
 
         var circleText = new BitmapText('Circle Wins', styleLight);
@@ -77,5 +75,11 @@ class Game {
         crossText.visible = false;
         app.stage.addChild(crossText);
         winText[SignType.Cross] = crossText;
+
+        var crossText = new BitmapText('Draw', styleDark);
+        crossText.position.x = 780;
+        crossText.visible = false;
+        app.stage.addChild(crossText);
+        winText[SignType.None] = crossText;
     }
 }

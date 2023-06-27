@@ -7,8 +7,7 @@ import Line;
 
 class Board {
     public var cells: Map<Int, Cell>;
-    public var onEnd: () -> Void;
-    public var onWin: (SignType: SignType) -> Void;
+    public var onEnd: (signType: SignType) -> Void;
     private var app: Application;
     private var lines: Array<Line>;
     private var move: SignType;
@@ -72,8 +71,6 @@ class Board {
         move = SignType.Circle;
 
         if (CheckEndGame()) {
-            onEnd();
-
             return;
         }
 
@@ -91,12 +88,15 @@ class Board {
         move = SignType.Cross;
         
         if (CheckEndGame()) {
-            onEnd();
         }
     }
 
     private function CheckEndGame(): Bool {
-        if (CheckWin()) {
+        var winSign = CheckWin();
+
+        if (winSign != null) {
+            onEnd(winSign);
+
             return true;
         }
 
@@ -106,22 +106,23 @@ class Board {
             }
         }
 
+        onEnd(SignType.None); // Draw
+
         return true;
     }
 
-    private function CheckWin(): Bool {
+    private function CheckWin(): SignType {
         for (line in lines) {
             for (sign in [SignType.Circle, SignType.Cross]) {
                 if (line.GetSum(sign) == 3) {
                     line.AnimateWin();
-                    onWin(sign);
     
-                    return true;
+                    return sign;
                 }
             }
         }
 
-        return false;
+        return null;
     }
 
     private function FindBestMove(): Cell {

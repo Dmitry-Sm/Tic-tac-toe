@@ -96,7 +96,6 @@ Board.prototype = {
 		cell.SetSign(SignType.Cross,this.spineDatas.get(SignType.Cross));
 		this.move = SignType.Circle;
 		if(this.CheckEndGame()) {
-			this.onEnd();
 			return;
 		}
 		haxe_Timer.delay($bind(this,this.EnemyMove),500);
@@ -108,12 +107,12 @@ Board.prototype = {
 		}
 		cell.SetSign(SignType.Circle,this.spineDatas.get(SignType.Circle));
 		this.move = SignType.Cross;
-		if(this.CheckEndGame()) {
-			this.onEnd();
-		}
+		this.CheckEndGame();
 	}
 	,CheckEndGame: function() {
-		if(this.CheckWin()) {
+		var winSign = this.CheckWin();
+		if(winSign != null) {
+			this.onEnd(winSign);
 			return true;
 		}
 		var cell = this.cells.iterator();
@@ -123,6 +122,7 @@ Board.prototype = {
 				return false;
 			}
 		}
+		this.onEnd(SignType.None);
 		return true;
 	}
 	,CheckWin: function() {
@@ -134,17 +134,15 @@ Board.prototype = {
 			var sign = SignType.Circle;
 			if(line.GetSum(sign) == 3) {
 				line.AnimateWin();
-				this.onWin(sign);
-				return true;
+				return sign;
 			}
 			var sign1 = SignType.Cross;
 			if(line.GetSum(sign1) == 3) {
 				line.AnimateWin();
-				this.onWin(sign1);
-				return true;
+				return sign1;
 			}
 		}
-		return false;
+		return null;
 	}
 	,FindBestMove: function() {
 		if(this.cells.h[5].sign == SignType.None) {
@@ -238,7 +236,6 @@ var Game = function(app) {
 	this.winText = new haxe_ds_EnumValueMap();
 	this.app = app;
 	this.board = new Board(app);
-	this.board.onWin = $bind(this,this.OnWin);
 	this.board.onEnd = $bind(this,this.OnEnd);
 	this.LoadAssets();
 	this.graphic = new PIXI.Graphics();
@@ -253,7 +250,8 @@ var Game = function(app) {
 };
 Game.__name__ = true;
 Game.prototype = {
-	OnEnd: function() {
+	OnEnd: function(sign) {
+		this.winText.get(sign).visible = true;
 		this.graphic.visible = true;
 	}
 	,Restart: function() {
@@ -263,6 +261,8 @@ Game.prototype = {
 		this.winText.get(sign).visible = false;
 		var sign = SignType.Cross;
 		this.winText.get(sign).visible = false;
+		var sign = SignType.None;
+		this.winText.get(sign).visible = false;
 	}
 	,LoadAssets: function() {
 		var loader = new PIXI.loaders.Loader();
@@ -270,12 +270,9 @@ Game.prototype = {
 		loader.add("lightFont","assets/fonts/lightFont.fnt");
 		loader.load($bind(this,this.onAssetsLoaded));
 	}
-	,OnWin: function(sign) {
-		this.winText.get(sign).visible = true;
-	}
 	,onAssetsLoaded: function() {
-		var styleDark = { font : "darkFont", fontSize : 120, align : "center"};
-		var styleLight = { font : "lightFont", fontSize : 120, align : "center"};
+		var styleDark = { font : "darkFont", fontSize : 120, align : "center", textAlign : "center"};
+		var styleLight = { font : "lightFont", fontSize : 120, align : "center", textAlign : "center"};
 		var circleText = new PIXI.extras.BitmapText("Circle Wins",styleLight);
 		circleText.position.x = 600;
 		circleText.visible = false;
@@ -286,6 +283,11 @@ Game.prototype = {
 		crossText.visible = false;
 		this.app.stage.addChild(crossText);
 		this.winText.set(SignType.Cross,crossText);
+		var crossText = new PIXI.extras.BitmapText("Draw",styleDark);
+		crossText.position.x = 780;
+		crossText.visible = false;
+		this.app.stage.addChild(crossText);
+		this.winText.set(SignType.None,crossText);
 	}
 };
 var Grid = function(app,rect) {
