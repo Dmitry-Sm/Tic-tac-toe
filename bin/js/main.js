@@ -277,12 +277,12 @@ Game.prototype = {
 		var styleDark = { font : "darkFont", fontSize : 120, align : "center"};
 		var styleLight = { font : "lightFont", fontSize : 120, align : "center"};
 		var circleText = new PIXI.extras.BitmapText("Circle Wins",styleLight);
-		circleText.position.x = 650;
+		circleText.position.x = 600;
 		circleText.visible = false;
 		this.app.stage.addChild(circleText);
 		this.winText.set(SignType.Circle,circleText);
 		var crossText = new PIXI.extras.BitmapText("Cross Wins",styleDark);
-		crossText.position.x = 650;
+		crossText.position.x = 600;
 		crossText.visible = false;
 		this.app.stage.addChild(crossText);
 		this.winText.set(SignType.Cross,crossText);

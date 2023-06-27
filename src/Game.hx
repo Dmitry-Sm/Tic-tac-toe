@@ -67,13 +67,13 @@ class Game {
         };
 
         var circleText = new BitmapText('Circle Wins', styleLight);
-        circleText.position.x = 650;
+        circleText.position.x = 600;
         circleText.visible = false;
         app.stage.addChild(circleText);
         winText[SignType.Circle] = circleText;
 
         var crossText = new BitmapText('Cross Wins', styleDark);
-        crossText.position.x = 650;
+        crossText.position.x = 600;
         crossText.visible = false;
         app.stage.addChild(crossText);
         winText[SignType.Cross] = crossText;
