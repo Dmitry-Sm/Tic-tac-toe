@@ -1,0 +1,11 @@
+-cp src
+-main Main
+-lib pixijs
+-lib actuate
+-lib random
+-dce full
+-D analyzer-optimize
+-D stats
+-D source-map-content
+-js bin/js/main.js
+-debug
